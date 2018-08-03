@@ -1,7 +1,7 @@
 package main
 
 import (
-        "github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2017-03-30/compute"
+        "github.com/Azure/azure-sdk-for-go/services/network/mgmt/2018-06-01/network"
         "context"
         "test/azure/client"
         "fmt"
@@ -13,14 +13,14 @@ import (
 func main(){
   ctx := context.Background()
   token, _, subscriptionID := auth.GetServicePrincipalToken()
-  vmClient := compute.NewVirtualMachinesClient(subscriptionID)
+  vmClient := network.NewSecurityGroupsClient(subscriptionID)
   vmClient.Authorizer = autorest.NewBearerAuthorizer(token)
 
-  response, _ := vmClient.ListAll(ctx)
+  response, _ := vmClient.Get(ctx, "M1038273", "db-nsg", "")
 
-//  fmt.Printf("%+v",response.Values())
+//  fmt.Printf("%+v",response)
 //  fmt.Printf("\n")
-  json_val, _ := json.Marshal(response.Values())
+  json_val, _ := json.Marshal(response)
   fmt.Printf("%s\n", string(json_val))
 
 }
