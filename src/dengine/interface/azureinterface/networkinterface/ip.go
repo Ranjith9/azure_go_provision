@@ -1,7 +1,7 @@
 package azurenetwork
 
 import (
-	"context"
+//	"context"
 	"fmt"
 	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2017-09-01/network"
 	"github.com/Azure/go-autorest/autorest"
@@ -20,22 +20,28 @@ func getIPClient() network.PublicIPAddressesClient {
 	return ipClient
 }
 
+type IpIn struct {
+        ResourceGroup string
+        IpName string      `json:"ipname,omitempty"`
+        Location string      `json:"location,omitempty"`
+}
+
 // CreatePublicIP creates a new public IP
 
-func CreatePublicIP(ctx context.Context, resourceGroup string, ipName string, location string) (ip network.PublicIPAddress, err error) {
+func (pubip IpIn) CreatePublicIP() (ip network.PublicIPAddress, err error) {
 	ipClient := getIPClient()
 	future, err := ipClient.CreateOrUpdate(
 		ctx,
-		resourceGroup,
-		ipName,
+		pubip.ResourceGroup,
+		pubip.IpName,
 		network.PublicIPAddress{
-			Name:     to.StringPtr(ipName),
-			Location: to.StringPtr(location),
+			Name:     to.StringPtr(pubip.IpName),
+			Location: to.StringPtr(pubip.Location),
 			PublicIPAddressPropertiesFormat: &network.PublicIPAddressPropertiesFormat{
 				PublicIPAddressVersion:   network.IPv4,
 				PublicIPAllocationMethod: network.Static,
 				DNSSettings: &network.PublicIPAddressDNSSettings{
-					DomainNameLabel: to.StringPtr(ipName),
+					DomainNameLabel: to.StringPtr(pubip.IpName),
 				},
 			},
 		},
@@ -51,4 +57,65 @@ func CreatePublicIP(ctx context.Context, resourceGroup string, ipName string, lo
 	}
 
 	return future.Result(ipClient)
+}
+
+func (pubip IpIn) DeletePublicIP() (ar autorest.Response, err error) {
+        ipClient := getIPClient()
+        future, err := ipClient.Delete(
+                ctx,
+                pubip.ResourceGroup,
+                pubip.IpName,
+                )
+        if err != nil {
+                return ar, fmt.Errorf("cannot delete ip: %v", err)
+        }
+
+        err = future.WaitForCompletion(ctx, ipClient.Client)
+        if err != nil {
+                return ar, fmt.Errorf("cannot get ip delete future response: %v", err)
+        }
+
+        return  future.Result(ipClient)
+}
+
+func (pubip IpIn) GetPublicIP() (ip network.PublicIPAddress, err error) {
+        ipClient := getIPClient()
+        future, err := ipClient.Get(
+                ctx,
+                pubip.ResourceGroup,
+                pubip.IpName,
+                "")
+
+        if err != nil {
+                return ip, fmt.Errorf("cannot list ip: %v", err)
+        }
+
+        return  future, err
+}
+
+func (pubip IpIn) ListPublicIP() (ip []network.PublicIPAddress, err error) {
+        ipClient := getIPClient()
+        future, err := ipClient.List(
+                ctx,
+                pubip.ResourceGroup,
+                )
+
+        if err != nil {
+                return ip, fmt.Errorf("cannot list ip: %v", err)
+        }
+
+        return  future.Values(), err
+}
+
+func (pubip IpIn) ListAllPublicIP() (ip []network.PublicIPAddress, err error) {
+        ipClient := getIPClient()
+        future, err := ipClient.ListAll(
+                ctx,
+                )
+
+        if err != nil {
+                return ip, fmt.Errorf("cannot list ip: %v", err)
+        }
+
+        return  future.Values(), err
 }

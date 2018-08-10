@@ -1,7 +1,7 @@
 package azurenetwork
 
 import (
-	"context"
+//	"context"
 	"fmt"
 	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2017-09-01/network"
 	"github.com/Azure/go-autorest/autorest"
@@ -19,39 +19,53 @@ func getNicClient() network.InterfacesClient {
 	return nicClient
 }
 
+type NicIn struct {
+        ResourceGroup string
+        NicName string       `json:"nicname,omitempty"`
+        NsgID string         `json:"nsgid,omitempty"`
+        SubnetID string      `json:"subnetid,omitempty"`
+        IpID string          `json:"ipid,omitempty"`
+        Location string      `json:"location,omitempty"`
+}
+
 // CreateNIC creates a new network interface.
 
-func CreateNIC(ctx context.Context, resourceGroup string, subnetID string, nsgID string, ipID, nicName string, location string) (nic network.Interface, err error) {
+func (n NicIn) CreateNIC() (nic network.Interface, err error) {
 
-	nicClient := getNicClient()
-	future, err := nicClient.CreateOrUpdate(
-		ctx,
-		resourceGroup,
-		nicName,
-		network.Interface{
-			Name:     to.StringPtr(nicName),
-			Location: to.StringPtr(location),
+	nicParams := network.Interface{
+			Name:     to.StringPtr(n.NicName),
+			Location: to.StringPtr(n.Location),
 			InterfacePropertiesFormat: &network.InterfacePropertiesFormat{
 				IPConfigurations: &[]network.InterfaceIPConfiguration{
 					{
-						Name: to.StringPtr(nicName + "-ipConfig1"),
+						Name: to.StringPtr(n.NicName + "-ipConfig1"),
 						InterfaceIPConfigurationPropertiesFormat: &network.InterfaceIPConfigurationPropertiesFormat{
 							Subnet: &network.Subnet{
-								ID: to.StringPtr(subnetID),
+								ID: to.StringPtr(n.SubnetID),
 							},
 							PrivateIPAllocationMethod: network.Dynamic,
 							PublicIPAddress: &network.PublicIPAddress{
-								ID: to.StringPtr(ipID),
+								ID: to.StringPtr(n.IpID),
 							},
 						},
 					},
 				},
-				NetworkSecurityGroup: &network.SecurityGroup{
-					ID: to.StringPtr(nsgID),
-				},
 			},
-		},
-	)
+		}
+
+        if n.NsgID != "" {
+                nicParams.NetworkSecurityGroup = &network.SecurityGroup{
+                        ID: to.StringPtr(n.NsgID),
+                }
+        }
+
+        nicClient := getNicClient()
+        future, err := nicClient.CreateOrUpdate(
+                ctx,
+                n.ResourceGroup,
+                n.NicName,
+                nicParams,
+        )
 
 	if err != nil {
 		return nic, fmt.Errorf("cannot create nic: %v", err)
@@ -64,3 +78,64 @@ func CreateNIC(ctx context.Context, resourceGroup string, subnetID string, nsgID
 
 	return future.Result(nicClient)
 }
+
+func (n NicIn) DeleteNIC() (ar autorest.Response, err error) {
+        nicClient := getNicClient()
+        future, err := nicClient.Delete(
+                ctx,
+                n.ResourceGroup,
+                n.NicName,
+                )
+        if err != nil {
+                return ar, fmt.Errorf("cannot delete nic: %v", err)
+        }
+
+        err = future.WaitForCompletion(ctx, nicClient.Client)
+        if err != nil {
+                return ar, fmt.Errorf("cannot get nic delete future response: %v", err)
+        }
+
+        return  future.Result(nicClient)
+}
+
+func (n NicIn) GetNIC() (nic network.Interface, err error) {
+        nicClient := getNicClient()
+        future, err := nicClient.Get(
+                ctx,
+                n.ResourceGroup,
+                n.NicName,
+                "")
+        if err != nil {
+                return nic, fmt.Errorf("cannot list nic: %v", err)
+        }
+
+        return  future, err
+}
+
+func (n NicIn) ListNIC() (nic []network.Interface, err error) {
+        nicClient := getNicClient()
+        future, err := nicClient.List(
+                ctx,
+                n.ResourceGroup,
+                )
+
+        if err != nil {
+                return nic, fmt.Errorf("cannot list nic: %v", err)
+        }
+
+        return  future.Values(), err
+}
+
+func ListAllNIC() (nic []network.Interface, err error) {
+        nicClient := getNicClient()
+        future, err := nicClient.ListAll(
+                ctx,
+                )
+
+        if err != nil {
+                return nic, fmt.Errorf("cannot list nic: %v", err)
+        }
+
+        return  future.Values(), err
+}
+

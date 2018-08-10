@@ -13,7 +13,15 @@ import (
 
 var (
         token, _, subscription = auth.GetServicePrincipalToken()
+        ctx = context.Background()
 )
+
+type VnetIn struct {
+        ResourceGroup string
+        VnetName string      `json:"vnetname,omitempty"`
+        Cidr string          `json:"cidr,omitempty"`
+        Location string      `json:"location,omitempty"`
+}
 
 func getVnetClient() network.VirtualNetworksClient {
 	vnetClient := network.NewVirtualNetworksClient(subscription)
@@ -23,17 +31,18 @@ func getVnetClient() network.VirtualNetworksClient {
 }
 
 // CreateVirtualNetwork creates a virtual network
-func CreateVirtualNetwork(ctx context.Context, resourceGroup string, vnetName string, cidr string, location string) (vnet network.VirtualNetwork, err error) {
+// func CreateVirtualNetwork(resourceGroup string, vnetName string, cidr string, location string) (vnet network.VirtualNetwork, err error) {
+func (net VnetIn) CreateVirtualNetwork() (vnet network.VirtualNetwork, err error) {
 	vnetClient := getVnetClient()
 	future, err := vnetClient.CreateOrUpdate(
 		ctx,
-		resourceGroup,
-		vnetName,
+		net.ResourceGroup,
+		net.VnetName,
 		network.VirtualNetwork{
-			Location: to.StringPtr(location),
+			Location: to.StringPtr(net.Location),
 			VirtualNetworkPropertiesFormat: &network.VirtualNetworkPropertiesFormat{
 				AddressSpace: &network.AddressSpace{
-					AddressPrefixes: &[]string{cidr},
+					AddressPrefixes: &[]string{net.Cidr},
 				},
 			},
 		})
@@ -48,4 +57,64 @@ func CreateVirtualNetwork(ctx context.Context, resourceGroup string, vnetName st
 	}
 
 	return future.Result(vnetClient)
+}
+
+func (net VnetIn) GetVirtualNetwork() (vnet network.VirtualNetwork, err error) {
+        vnetClient := getVnetClient()
+        future, err := vnetClient.Get(
+                ctx,
+                net.ResourceGroup,
+                net.VnetName,
+                "")
+
+        if err != nil {
+                return vnet, fmt.Errorf("cannot create virtual network: %v", err)
+        }
+
+        return future, err
+}
+
+func (net VnetIn) DeleteVirtualNetwork() (ar autorest.Response, err error) {
+        vnetClient := getVnetClient()
+        future, err := vnetClient.Delete(
+                ctx,
+                net.ResourceGroup,
+                net.VnetName,
+                )
+
+        if err != nil {
+                return ar, fmt.Errorf("cannot create virtual network: %v", err)
+        }
+
+        err = future.WaitForCompletion(ctx, vnetClient.Client)
+        if err != nil {
+                return ar, fmt.Errorf("cannot get the vnet create or update future response: %v", err)
+        }
+
+        return  future.Result(vnetClient)
+}
+
+func (net VnetIn) ListVirtualNetwork() (vnet []network.VirtualNetwork, err error) {
+        vnetClient := getVnetClient()
+        future, err := vnetClient.List(
+                ctx,
+                net.ResourceGroup)
+
+        if err != nil {
+                return vnet, fmt.Errorf("cannot create virtual network: %v", err)
+        }
+
+        return future.Values(), err
+}
+
+func ListAllVirtualNetwork() (vnet []network.VirtualNetwork, err error) {
+        vnetClient := getVnetClient()
+        future, err := vnetClient.ListAll(
+                ctx)
+
+        if err != nil {
+                return vnet, fmt.Errorf("cannot create virtual network: %v", err)
+        }
+
+        return future.Values(), err
 }
