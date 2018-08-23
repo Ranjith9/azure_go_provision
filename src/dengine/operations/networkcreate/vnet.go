@@ -25,9 +25,9 @@ func main() {
 //                  fmt.Println(string(k))
               fmt.Println(*t.Name)
          }
-
-//         r := azurenetwork.VnetIn{ResourceGroup: "M1038273", VnetName: "test"}
-//         resp, _ := r.DeleteVirtualNetwork()
-//         if resp.Response.StatusCode == 200 { fmt.Println("Deleted network "+r.VnetName+" successfully")}
 */
+         r := azurenetwork.VnetIn{ResourceGroup: "M1038273", VnetName: "test"}
+         resp, _ := r.DeleteVirtualNetwork()
+         if resp.Response.StatusCode == 200 { fmt.Println("Deleted network "+r.VnetName+" successfully")}
+
 }

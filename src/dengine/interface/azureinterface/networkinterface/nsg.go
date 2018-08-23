@@ -102,7 +102,7 @@ func (ns NsgIn) ListNetworkSecurityGroup() (nsg []network.SecurityGroup, err err
 
 func ListAllNetworkSecurityGroup() (nsg []network.SecurityGroup, err error) {
         nsgClient := getNsgClient()
-        future, err := nsgClient.List(
+        future, err := nsgClient.ListAll(
                 ctx,
                 )
 
