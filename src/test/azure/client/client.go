@@ -33,10 +33,10 @@ func init() {
 	}
 
 	for _, t := range data {
-		if t.Profile == "sumanth" {
+		if t.Profile == "ranjith" {
 			result = t
 			break
-		} else if t.Profile != "sumanth" {
+		} else if t.Profile != "ranjith" {
 			continue
 		}
 	}
