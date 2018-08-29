@@ -107,7 +107,7 @@ func ListAllNetworkSecurityGroup() (nsg []network.SecurityGroup, err error) {
                 )
 
         if err != nil {
-                return nsg, fmt.Errorf("cannot list nsg: %v", err)
+                return nsg, fmt.Errorf("cannot list NSGs: %v", err)
         }
 
         return  future.Values(), err

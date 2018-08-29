@@ -106,7 +106,7 @@ func (n NicIn) GetNIC() (nic network.Interface, err error) {
                 n.NicName,
                 "")
         if err != nil {
-                return nic, fmt.Errorf("cannot list nic: %v", err)
+                return nic, fmt.Errorf("cannot list get: %v", err)
         }
 
         return  future, err
@@ -133,9 +133,8 @@ func ListAllNIC() (nic []network.Interface, err error) {
                 )
 
         if err != nil {
-                return nic, fmt.Errorf("cannot list nic: %v", err)
+                return nic, fmt.Errorf("cannot list NICs: %v", err)
         }
 
         return  future.Values(), err
 }
-

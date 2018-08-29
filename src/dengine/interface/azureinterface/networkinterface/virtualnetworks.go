@@ -68,7 +68,7 @@ func (net VnetIn) GetVirtualNetwork() (vnet network.VirtualNetwork, err error) {
                 "")
 
         if err != nil {
-                return vnet, fmt.Errorf("cannot create virtual network: %v", err)
+                return vnet, fmt.Errorf("cannot get virtual network: %v", err)
         }
 
         return future, err
@@ -83,7 +83,7 @@ func (net VnetIn) DeleteVirtualNetwork() (ar autorest.Response, err error) {
                 )
 
         if err != nil {
-                return ar, fmt.Errorf("cannot create virtual network: %v", err)
+                return ar, fmt.Errorf("cannot delete virtual network: %v", err)
         }
 
         err = future.WaitForCompletion(ctx, vnetClient.Client)
@@ -101,7 +101,7 @@ func (net VnetIn) ListVirtualNetwork() (vnet []network.VirtualNetwork, err error
                 net.ResourceGroup)
 
         if err != nil {
-                return vnet, fmt.Errorf("cannot create virtual network: %v", err)
+                return vnet, fmt.Errorf("cannot list virtual network: %v", err)
         }
 
         return future.Values(), err
@@ -113,7 +113,7 @@ func ListAllVirtualNetwork() (vnet []network.VirtualNetwork, err error) {
                 ctx)
 
         if err != nil {
-                return vnet, fmt.Errorf("cannot create virtual network: %v", err)
+                return vnet, fmt.Errorf("cannot list virtual networks: %v", err)
         }
 
         return future.Values(), err

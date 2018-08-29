@@ -124,7 +124,7 @@ func (v VMIn) GetVM() (vm compute.VirtualMachine, err error) {
                 "")
 
         if err != nil {
-                return vm, fmt.Errorf("cannot get virtual network: %v", err)
+                return vm, fmt.Errorf("cannot get virtual VM: %v", err)
         }
 
         return future, err
@@ -139,7 +139,7 @@ func (v VMIn) ListVM() (vm []compute.VirtualMachine, err error) {
                 )
 
         if err != nil {
-                return vm, fmt.Errorf("cannot list the vm in a resourcegroup: %v", err)
+                return vm, fmt.Errorf("cannot list the VMs in a resourcegroup: %v", err)
         }
 
         return future.Values(), err
@@ -153,7 +153,7 @@ func ListAllVM() (vm []compute.VirtualMachine, err error) {
                 )
 
         if err != nil {
-                return vm, fmt.Errorf("cannot list the vm in a resourcegroup: %v", err)
+                return vm, fmt.Errorf("cannot list the VMs: %v", err)
         }
 
         return future.Values(), err

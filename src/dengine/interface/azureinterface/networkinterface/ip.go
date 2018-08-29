@@ -22,7 +22,7 @@ func getIPClient() network.PublicIPAddressesClient {
 
 type IpIn struct {
         ResourceGroup string
-        IpName string      `json:"ipname,omitempty"`
+        IpName string        `json:"ipname,omitempty"`
         Location string      `json:"location,omitempty"`
 }
 
@@ -101,7 +101,7 @@ func (pubip IpIn) ListPublicIP() (ip []network.PublicIPAddress, err error) {
                 )
 
         if err != nil {
-                return ip, fmt.Errorf("cannot list ip: %v", err)
+                return ip, fmt.Errorf("cannot list IPs: %v", err)
         }
 
         return  future.Values(), err

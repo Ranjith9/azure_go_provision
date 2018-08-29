@@ -23,8 +23,8 @@ func main() {
         sn, _ := r.GetSnapshot()
         jsonMarshall(sn)
 
-        resp, _ := r.DeleteSnapshot()
-        if resp.Response.StatusCode == 200 { fmt.Println("Deleted network "+r.SnapshotName+" successfully")}
+//        resp, _ := r.DeleteSnapshot()
+//        if resp.Response.StatusCode == 200 { fmt.Println("Deleted snapshot "+r.SnapshotName+" successfully")}
 
 }
 

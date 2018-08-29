@@ -63,6 +63,10 @@ func (sub SubnetIn) DeleteVirtualNetworkSubnet() (ar autorest.Response, err erro
                 sub.SubnetName,
                 )
 
+        if err != nil {
+                return ar, fmt.Errorf("cannot delete subnet: %v", err)
+        }
+
         err = future.WaitForCompletion(ctx, subnetsClient.Client)
         if err != nil {
                 return ar, fmt.Errorf("cannot get the subnet delete future response: %v", err)
@@ -97,7 +101,7 @@ func (sub SubnetIn) ListVirtualNetworkSubnet() (subnet []network.Subnet, err err
                 )
 
         if err != nil {
-                return subnet, fmt.Errorf("cannot list dubnetwork: %v", err)
+                return subnet, fmt.Errorf("cannot list subnetwork: %v", err)
         }
 
         return future.Values(), err
