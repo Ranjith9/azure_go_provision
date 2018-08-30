@@ -114,6 +114,27 @@ func (v VMIn) CreateVM() (vm compute.VirtualMachine, err error) {
 	return future.Result(vmClient)
 }
 
+func (v VMIn) DeleteVM() (ar autorest.Response, err error) {
+
+        vmClient := getVMClient()
+        future, err := vmClient.Delete(
+                ctx,
+                v.ResourceGroup,
+                v.VmName,
+                )
+        if err != nil {
+                return ar, fmt.Errorf("cannot delete VM: %v", err)
+        }
+
+        err = future.WaitForCompletion(ctx, vmClient.Client)
+        if err != nil {
+                return ar, fmt.Errorf("cannot get the VM delete future response: %v", err)
+        }
+
+        return  future.Result(vmClient)
+}
+
+
 func (v VMIn) GetVM() (vm compute.VirtualMachine, err error) {
 
         vmClient := getVMClient()

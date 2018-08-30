@@ -16,11 +16,11 @@ func main() {
 	subnet, _ := s.CreateVirtualNetworkSubnet()
 	jsonMarshall(subnet)
 
-	n := azurenetwork.NsgIn{"M1038273", "test-nsg", "CentralIndia"}
+	n := azurenetwork.NsgIn{"test", "test-nsg", "CentralIndia"}
 	nsg, _ := n.CreateNetworkSecurityGroup()
 	jsonMarshall(nsg)
 
-	nr := azurenetwork.SecurityRuleIn{"M1038273", "test-nsg", "ssh", "22", 123}
+	nr := azurenetwork.SecurityRuleIn{"test", "test-nsg", "ssh", "22", 123}
 	nrule, _ := nr.CreateNetworkSecurityRule()
 	jsonMarshall(nrule)
 
