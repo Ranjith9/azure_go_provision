@@ -24,11 +24,26 @@ type SubnetIn struct {
         VnetName string      `json:"vnetname,omitempty"`
         SubnetName string    `json:"subnetname,omitempty"`
         SubnetCidr string    `json:"cidr,omitempty"`
+        NsgID      string    `json:nsg,omitempty`
 }
 
 // CreateVirtualNetworkSubnet creates a subnet in an existing vnet
 
 func (sub SubnetIn) CreateVirtualNetworkSubnet() (subnet network.Subnet, err error) {
+
+        subnetParams := network.Subnet {
+                Name:     to.StringPtr(sub.SubnetName),
+                SubnetPropertiesFormat: &network.SubnetPropertiesFormat{
+                                AddressPrefix: to.StringPtr(sub.SubnetCidr),
+                        },
+        }
+
+        if sub.NsgID != "" {
+                r := subnetParams.SubnetPropertiesFormat
+                r.NetworkSecurityGroup = &network.SecurityGroup{
+                         ID: to.StringPtr(sub.NsgID),
+                }
+        }
 	subnetsClient := getSubnetsClient()
 
 	future, err := subnetsClient.CreateOrUpdate(
@@ -36,11 +51,8 @@ func (sub SubnetIn) CreateVirtualNetworkSubnet() (subnet network.Subnet, err err
 		sub.ResourceGroup,
 		sub.VnetName,
 		sub.SubnetName,
-		network.Subnet{
-			SubnetPropertiesFormat: &network.SubnetPropertiesFormat{
-				AddressPrefix: to.StringPtr(sub.SubnetCidr),
-			},
-		})
+                subnetParams,
+		)
 	if err != nil {
 		return subnet, fmt.Errorf("cannot create subnet: %v", err)
 	}

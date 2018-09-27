@@ -5,7 +5,7 @@ import (
         "io/ioutil"
         "log"
 	"context"
-	"dengine/access/azureaccess"
+	"azure/access"
 	"fmt"
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-04-01/compute"
 	"github.com/Azure/go-autorest/autorest"

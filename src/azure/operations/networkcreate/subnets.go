@@ -1,7 +1,7 @@
 package main
 
 import (
-         "dengine/interface/azureinterface/networkinterface"
+         "azure/interface/networkinterface"
          "fmt"
          "encoding/json"
 )

@@ -23,20 +23,25 @@ func getNsgClient() network.SecurityGroupsClient {
 type NsgIn struct {
         ResourceGroup string
         NsgName string      `json:"nsgname,omitempty"`
+//        SubnetID  string      `json:"subnet,omitempty"`
         Location string      `json:"location,omitempty"`
 }
 
 // CreateNetworkSecurityGroup creates a new network security group.
 
 func (ns NsgIn) CreateNetworkSecurityGroup() (nsg network.SecurityGroup, err error) {
+
+        nsgParams := network.SecurityGroup{
+                Name: to.StringPtr(ns.NsgName),
+                Location:  to.StringPtr(ns.Location),
+                }
+
 	nsgClient := getNsgClient()
 	future, err := nsgClient.CreateOrUpdate(
 		ctx,
 		ns.ResourceGroup,
 		ns.NsgName,
-		network.SecurityGroup{
-			Location: to.StringPtr(ns.Location),
-		},
+		nsgParams,
 	)
 
 	if err != nil {
@@ -50,6 +55,7 @@ func (ns NsgIn) CreateNetworkSecurityGroup() (nsg network.SecurityGroup, err err
 
 	return future.Result(nsgClient)
 }
+
 
 func (ns NsgIn) DeleteNetworkSecurityGroup() (ar autorest.Response, err error) {
         nsgClient := getNsgClient()

@@ -7,7 +7,7 @@ import (
         "github.com/Azure/go-autorest/autorest"
 //        "github.com/Azure/go-autorest/autorest/to"
 //        "dengine/interface/azureinterface/getclient"
-        "dengine/access/azureaccess"
+        "azure/access"
 //        "github.com/Azure/go-autorest/autorest/adal"
 )
 

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/Azure/go-autorest/autorest/adal"
 	"github.com/Azure/go-autorest/autorest/azure"
+//        "github.com/Azure/azure-sdk-for-go/services/preview/subscription/mgmt/2018-03-01-preview/subscription"
 	"io/ioutil"
 	"log"
 	"os/user"
@@ -18,7 +19,10 @@ type Credentials struct {
 	ClientSecret   string
 }
 
-var result Credentials
+var (
+        result Credentials
+//        subscription string
+)
 
 func init() {
 
